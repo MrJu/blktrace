@@ -68,8 +68,12 @@ static void handle_complete(struct io *c_iop)
 	dip_foreach_list(c_iop, IOP_Q, &head);
 	list_for_each_safe(p, q, &head) {
 		struct io *q_iop = list_entry(p, struct io, f_head);
-		__u64 q2c = tdelta(q_iop->t.time, c_iop->t.time);
+		__u64 q2c;
 
+		if (c_iop->t.sector != q_iop->t.sector)
+			continue;
+
+		q2c = tdelta(q_iop->t.time, c_iop->t.time);
 		c_iop->bytes_left -= q_iop->t.bytes;
 
 		update_q2c(q_iop, q2c);
