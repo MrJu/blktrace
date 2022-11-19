@@ -1196,6 +1196,11 @@ static void fixup_complete(struct per_dev_info *pdi, struct blk_io_trace *t)
 	struct io_track *iot;
 	__u64 start_sector;
 
+	/*
+	 * do not change sector and bytes any more
+	 */
+	return;
+
 	iot = __find_track(pdi, t->sector);
 	if (!iot)
 		return;
