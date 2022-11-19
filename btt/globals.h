@@ -46,6 +46,30 @@
 #define TO_SEC(nanosec)	((double)(nanosec) / 1.0e9)
 #define TO_MSEC(nanosec) (1000.0 * TO_SEC(nanosec))
 
+#define BLK_TA_MASK (((1 << BLK_TC_SHIFT) - 1) & ~__BLK_TA_CGROUP)
+#define __trace_action(t) (t->action & BLK_TA_MASK)
+
+#define __scan_depth_end(t, end, depth) \
+		min(((void *) (unsigned long) t + sizeof(t) * depth), end)
+
+#define __trace_size(t) (sizeof(*t) + t->pdu_len)
+
+#define __next_trace(t) \
+		((typeof(t)) ((unsigned long) t + __trace_size(t)))
+
+#define for_each_trace(t, from, to) \
+		for (t = from; (void *) t < (void *) to; t = __next_trace(t))
+
+#define dbg_print(t)                                                \
+		printf("magic:0x%x sequence:%u time:%lld "          \
+				"sector:%lld bytes:%u action:0x%x " \
+				"pid:%u device:0x%x cpu:%u "        \
+				"err:%hd pdu_len:%hd\n",            \
+				t->magic, t->sequence, t->time,     \
+				t->sector, t->bytes, t->action,     \
+				t->pid, t->device, t->cpu,          \
+				t->error, t->pdu_len);
+
 enum iop_type {
 	IOP_Q = 0,
 	IOP_X = 1,
@@ -179,7 +203,7 @@ extern double range_delta, plat_freq, last_t_seen;
 extern FILE *rngs_ofp, *avgs_ofp, *xavgs_ofp, *iostat_ofp, *per_io_ofp;
 extern FILE *msgs_ofp;
 extern int verbose, done, time_bounded, output_all_data, seek_absolute;
-extern int easy_parse_avgs, ignore_remaps, do_p_live;
+extern int easy_parse_avgs, x2q, ignore_remaps, do_p_live;
 extern unsigned int n_devs;
 extern unsigned long n_traces;
 extern struct list_head all_devs, all_procs;
@@ -363,5 +387,8 @@ void trace_requeue(struct io *r_iop);
 void *unplug_hist_alloc(struct d_info *dip);
 void unplug_hist_free(void *arg);
 void unplug_hist_add(struct io *u_iop);
+
+/* x2q.c */
+int do_x2q(const char *name);
 
 #include "inlines.h"

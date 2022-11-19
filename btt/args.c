@@ -29,7 +29,7 @@
 
 #define SETBUFFER_SIZE	(64 * 1024)
 
-#define S_OPTS	"aAB:d:D:e:hi:I:l:L:m:M:o:p:P:q:Q:rs:S:t:T:u:VvXz:Z"
+#define S_OPTS	"aAB:d:D:e:hi:I:l:L:m:M:o:p:P:q:Q:rs:S:t:T:u:VvXxz:Z"
 static struct option l_opts[] = {
 	{
 		.name = "seek-absolute",
@@ -200,6 +200,12 @@ static struct option l_opts[] = {
 		.val = 'X'
 	},
 	{
+		.name = "x2q",
+		.has_arg = no_argument,
+		.flag = NULL,
+		.val = 'x'
+	},
+	{
 		.name = "q2d-latencies",
 		.has_arg = required_argument,
 		.flag = NULL,
@@ -238,6 +244,7 @@ static char usage_str[] = \
 	"[ -V               | --version ]\n" \
 	"[ -v               | --verbose ]\n" \
 	"[ -X               | --easy-parse-avgs ]\n" \
+	"[ -x               | --x2q ]\n" \
 	"[ -z <output name> | --q2d-latencies=<output name> ]\n" \
 	"[ -Z               | --do-active\n" \
 	"\n";
@@ -381,6 +388,9 @@ void handle_args(int argc, char *argv[])
 		case 'X':
 			easy_parse_avgs++;
 			break;
+		case 'x':
+			x2q = 1;
+			break;
 		case 'z':
 			q2d_name = optarg;
 			break;
@@ -397,6 +407,9 @@ void handle_args(int argc, char *argv[])
 		usage(argv[0]);
 		exit(1);
 	}
+
+	if (x2q)
+		return;
 
 	if (sps_name && !seek_name) {
 		fprintf(stderr, "FATAL: -m option requires -s options\n");

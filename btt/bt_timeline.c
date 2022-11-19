@@ -32,7 +32,7 @@ char *d2c_name, *q2c_name, *per_io_name, *unplug_hist_name;
 char *sps_name, *aqd_name, *q2d_name, *per_io_trees;
 FILE *rngs_ofp, *avgs_ofp, *xavgs_ofp, *per_io_ofp, *msgs_ofp;
 int verbose, done, time_bounded, output_all_data, seek_absolute;
-int easy_parse_avgs, ignore_remaps, do_p_live;
+int easy_parse_avgs, x2q, ignore_remaps, do_p_live;
 double t_astart, t_aend, last_t_seen;
 unsigned long n_traces;
 struct avgs_info all_avgs;
@@ -59,6 +59,9 @@ int process(void);
 int main(int argc, char *argv[])
 {
 	handle_args(argc, argv);
+
+	if (x2q)
+		return 	do_x2q(input_name);
 
 	init_dev_heads();
 	iostat_init();
